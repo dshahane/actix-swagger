@@ -40,6 +40,7 @@ use utoipa_swagger_ui::SwaggerUi;
 mod search_service;
 // Authentication logic
 mod auth;
+mod federated_search;
 
 // Main function to run the Actix web server.
 // #[actix_web::main] makes the main function asynchronous.
@@ -49,7 +50,7 @@ async fn main() -> std::io::Result<()> {
     #[derive(OpenApi)]
     #[openapi(
         // Define paths (endpoints) in the API
-        paths(search_api),
+        paths(search_api, fedsearch_api),
         // Define data schemas used by the API
         components(schemas(SearchRequest, SearchResponse)),
         // Define security schemes for the API
@@ -90,6 +91,7 @@ async fn main() -> std::io::Result<()> {
             )
             // Register our search API endpoint
             .service(search_api)
+            .service(fedsearch_api)
             // Add our authentication middleware to the application.
             // This will protect all routes that follow.
             .wrap(auth_checker)
@@ -146,6 +148,40 @@ async fn search_api(search_request: web::Json<SearchRequest>) -> impl Responder 
             format!("Result 2 for: {}", search_request.query),
             format!("Result 3 for: {}", search_request.query),
         ],
+    };
+    HttpResponse::Ok().json(response)
+}
+
+// Define a web search endpoint
+#[utoipa::path(
+    // HTTP method and path
+    post,
+    path = "/fedsearch",
+    // Summary of the endpoint
+    summary = "Performs a federated web search.",
+    // Description of the endpoint
+    description = "Searches product search sites for the given query and returns a list of results.",
+    // Request body definition
+    request_body = SearchRequest,
+    // Response definitions
+    responses(
+        (status = 200, description = "Search successful", body = SearchResponse),
+        (status = 401, description = "Unauthorized - Invalid credentials"),
+    ),
+    // Define the security requirement for this path
+    security(
+        ("basic_auth" = [])
+    )
+)]
+#[post("/fedsearch")]
+async fn fedsearch_api(
+    search_request: web::Json<SearchRequest>,
+    search_service: web::Data<search_service::SearchService>,
+) -> impl Responder {
+    let results = search_service.federated_search(&search_request.query).await;
+
+    let response = SearchResponse {
+        results,
     };
     HttpResponse::Ok().json(response)
 }
