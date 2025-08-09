@@ -29,7 +29,7 @@ async fn search_amazon(query: String) -> Vec<String> {
 
 // The main function to perform the federated search.
 // It takes a query and runs both search functions concurrently.
-pub async fn perform_federated_search(query: &str) -> Vec<String> {
+pub(crate) async fn perform_federated_search(query: &str) -> Vec<String> {
     // Define a type alias for a boxed future to make the code cleaner.
     type SearchFuture = BoxFuture<'static, Vec<String>>;
 

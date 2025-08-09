@@ -1,0 +1,19 @@
+/* You can generate your own custom Tailwind CSS file here,
+   or link to the CDN in your index.html.
+   For example, using the Tailwind CLI:
+   npx tailwindcss -i ./src/input.css -o ./swagger_ui_override/tailwind.css --minify
+*/
+
+/* Or, you can manually add styles to override existing Swagger UI classes */
+.swagger-ui .topbar {
+    @apply bg-gray-900;
+}
+
+.swagger-ui .opblock .opblock-summary {
+    @apply border-l-4;
+}
+
+/* For example, green for GET requests */
+.swagger-ui .opblock.opblock-get {
+    @apply border-reg-500;
+}

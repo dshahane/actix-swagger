@@ -1,17 +1,12 @@
-// Import the BasicAuth extractor
 use actix_web_httpauth::extractors::basic::BasicAuth;
-// Import the middleware::HttpAuthentication and actix_web::Error for handling errors
-use actix_web_httpauth::middleware::HttpAuthentication;
 use actix_web::Error;
-// A future that returns a Result
-use std::future::ready;
 
 // This is a simple, hardcoded user store. In a real application,
 // this would be a database or another secure storage.
 const VALID_USERNAME: &str = "user";
 const VALID_PASSWORD: &str = "password";
 
-// Asynchronous function to validate Basic authentication credentials
+// Synchronous function to validate Basic authentication credentials.
 pub fn validate_basic_auth(auth: &BasicAuth) -> Result<(), Error> {
     // Extract the username and password from the BasicAuth struct
     let username = auth.user_id();
